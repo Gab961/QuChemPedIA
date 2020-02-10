@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+{% load static %}
+{% load render_bundle from webpack_loader %}
+
+{# block used as header #}
+{% block header %}
+<html lang="fr">
+<head>
+    <meta name="viewport" content="width=device-width"/>
+    <title>QuChemPedIA</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Nunito"/>
+</head>
+{% endblock %}
+{% block nav %}
+<div id="sign" class="row float-right">
+    {% if not user.is_authenticated %}
+    <a title="Sign up/Sign in" href="{% url 'auth' %}" class="log">
+        Sign In
+    </a><span class="fas fa-sign-in-alt iconLog"></span>
+    {% else %}
+    <a href="{% url 'dashboard/import' %}" class="log">
+        Import
+    </a><span class="fas fa-file-import iconLog"></span>
+    <a href="{% url 'dasboard/account' %}" class="log">
+        Profile
+    </a><span class="fas fa-user-cog iconLog"></span>
+    <a title="Log-out" href="{% url 'logout' %}" class="log">
+        Log Out
+    </a><span class="fas fa-sign-out-alt iconLog"></span>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-center w-100 align-content-center" style="height: 100vh">
+        <div class="col">
+            <h1 class="text-center text-primary">QuChemPedIA</h1>
+            <h2 id="subtitle" class="diplay-2 text-center">Quantum Chemistry Collaborative EncyclopedIA</h2>
+            <br/>
+            <div class="row justify-content-center">
+                <!-- Formulaire de recherche -->
+                <form class="col-8 justify-content-between" action="{% url 'query' %}" method="GET">
+                    <div class="row">
+                        {% csrf_token %}
+                        {{ query_form.as_table }}
+                        <button class="mt-1 mb-1 mt-lg-0 btn btn-info default-primary-color col-12 col-lg-2"
+                                type="submit">Search <i class="fa fa-search"></i></button>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <!-- Génération de la navbar pour footer -->
+    <nav class="navbar navbar-expand-sm fixed-bottom">
+        <div class="footer">
+            <a class="link-footer" href=""><u>Project</u></a>
+            <a class="link-footer" href=""><u>Team</u></a>
+            <a class="link-footer" href=""><u>Terms</u></a>
+        </div>
+    </nav>
+</footer>
+
+{% render_bundle 'main' %}
+<script src="{% static 'js/dropzone.js' %}"></script>
+
+<script>
+/* Script de rendu pour le formulaire de recherche */
+ $(document).ready(function(){
+      $("#id_search").attr("placeholder","Search...");
+      $("#id_typeQuery").css("width","15%");
+  });
+
+</script>
+<script>
+
+    Dropzone.autoDiscover = false;
+   // using jQuery
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        var csrftoken = getCookie('csrftoken');
+       $("#myDropzone").dropzone({
+        url:"{% url 'dashboard/import' %}",
+        addRemoveLinks : true,
+        maxFilesize: 5000,
+        dictDefaultMessage: "Drop your log files here or click to upload",
+        dictResponseError: 'Error uploading file!',
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        success: function (file, response) {
+            location.reload();
+            this.removeFile(file); //todo discuter de quoi faire
+        }
+        });
+
+</script>
+</html>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "base_account.html" %}
+{% load staticfiles %}
+{% block content %}
+<main role="main" class="col-md-9" id="dashboard_main">
+    {% if not user.is_authenticated %}
+    <div class="text-center text-danger">
+        <div class="col-lg-12">
+            <p>
+                <svg class="feather feather-alert-triangle sc-dnqmqq jxshSx" xmlns="http://www.w3.org/2000/svg"
+                     width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-reactid="56">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                    </path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12" y2="17"></line>
+                </svg>
+                Warning! You are uploading a file as an anonymous user.
+                Authorship information will be lost in the database entry and it won't appear in your history!
+            </p>
+        </div>
+    </div>
+    {% endif %}
+    {% if user.affiliation.strip|length <= 0 or user.affiliation == 'None' %}
+    <div class="text-center text-danger">
+        <div class="col-lg-12">
+            <p>
+                <svg class="feather feather-alert-triangle sc-dnqmqq jxshSx" xmlns="http://www.w3.org/2000/svg"
+                     width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-reactid="56">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                    </path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12" y2="17"></line>
+                </svg>
+                Warning! You are uploading a file but your affiliation is unknown.
+                This database entry won't be related to your laboratory!
+            </p>
+        </div>
+    </div>
+    {% endif %}
+    <div id="dropzone">
+        <form action="{% url 'dashboard/import' %}" class="dropzone" id="my-awesome-dropzone">
+            {% csrf_token %}
+            <input type="file" id="fileInput" name="file" multiple="false" onchange="myDropzoneJs();"
+                   style="display: none"/>
+            <button class="btn btn-primary" type="submit" id="btn_upload" name="btn_upload" style="display: none">Send
+            </button>
+        </form>
+    </div>
+    {% if user.number_of_upload_this_day >= 10 %}
+    <div class="text-center text-info">
+        <div class="col-lg-12">
+            <p>
+                <svg class="feather feather-info sc-dnqmqq jxshSx" xmlns="http://www.w3.org/2000/svg"
+                     width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-reactid="656">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12" y2="8"></line>
+                </svg>
+                If you want to import a large set of calculations results, you could contact us!
+                An <i>ad hoc</i> import script could be set. That will be quicker.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+    {% if number_of_stand_by_import <= 20 %}
+
+    {% else %}
+    <div class="text-center text-info">
+        <div class="col-lg-12">
+            <p>
+                <svg class="feather feather-info sc-dnqmqq jxshSx" xmlns="http://www.w3.org/2000/svg"
+                     width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-reactid="656">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12" y2="8"></line>
+                </svg>
+                You have reached the importation limit. Please wait until the stand-by importations have been processed.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+</main>
+
+{% endblock %}
